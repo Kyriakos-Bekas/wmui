@@ -19,71 +19,135 @@ export interface WashinProgramBase {
   spin: AllowedSpin;
   inProgress: boolean;
   start: string; // Date string
+  slug: string;
 }
 
 export const DEFAULT_WASHING_PROGRAMS = [
   {
-    name: "Cotton",
+    id: "Cotton",
+    slug: "cotton",
+    name: {
+      en: "Cotton",
+      gr: "Βαμβακερά",
+    },
     spin: 800,
     temperature: 60,
   },
   {
-    name: "Wool",
+    id: "Wool",
+    slug: "wool",
+    name: {
+      en: "Wool",
+      gr: "Μάλλινα",
+    },
     spin: 600,
     temperature: 40,
   },
   {
-    name: "Synthetic",
+    id: "Synthetic",
+    slug: "synthetic",
+    name: {
+      en: "Synthetic",
+      gr: "Συνθετικά",
+    },
     spin: 800,
     temperature: 40,
   },
   {
-    name: "Delicates",
+    id: "Delicates",
+    slug: "delicates",
+    name: {
+      en: "Delicates",
+      gr: "Ευαίσθητα",
+    },
     spin: 600,
     temperature: 30,
   },
   {
-    name: "Handwash",
+    id: "Handwash",
+    slug: "handwash",
+    name: {
+      en: "Handwash",
+      gr: "Στο χέρι",
+    },
     spin: 100,
     temperature: 30,
   },
   {
-    name: "Intensive",
+    id: "Intensive",
+    slug: "intensive",
+    name: {
+      en: "Intensive",
+      gr: "Εντατικό",
+    },
     spin: 1000,
     temperature: 60,
   },
   {
-    name: "Quick",
+    id: "Quick",
+    slug: "quick",
+    name: {
+      en: "Quick",
+      gr: "Γρήγορο",
+    },
     spin: 800,
     temperature: 40,
   },
   {
-    name: "Sport",
+    id: "Sport",
+    slug: "sport",
+    name: {
+      en: "Sport",
+      gr: "Αθλητικά",
+    },
     spin: 800,
     temperature: 40,
   },
   {
-    name: "Drain",
+    id: "Drain",
+    slug: "drain",
+    name: {
+      en: "Drain",
+      gr: "Στύψιμο",
+    },
     spin: 200,
     temperature: 20,
   },
   {
-    name: "Rinse",
+    id: "Rinse",
+    slug: "rinse",
+    name: {
+      en: "Rinse",
+      gr: "Ξέβγαλμα",
+    },
     spin: 200,
     temperature: 20,
   },
   {
-    name: "Colored",
+    id: "Colored",
+    slug: "colored",
+    name: {
+      en: "Colored",
+      gr: "Χρωματιστά",
+    },
     spin: 800,
     temperature: 40,
   },
   {
-    name: "Shirts",
+    id: "Shirts",
+    slug: "shirts",
+    name: {
+      en: "Shirts",
+      gr: "Πουκάμισα",
+    },
     spin: 800,
     temperature: 40,
   },
 ] as const;
 
 // extract the default program types from the array
-export type DefaultWashingProgramName =
-  (typeof DEFAULT_WASHING_PROGRAMS)[number]["name"];
+export type DefaultWashingProgramNameEn =
+  (typeof DEFAULT_WASHING_PROGRAMS)[number]["name"]["en"];
+
+export type DefaultWashingProgramNameGr =
+  (typeof DEFAULT_WASHING_PROGRAMS)[number]["name"]["gr"];
