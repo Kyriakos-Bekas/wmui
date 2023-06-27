@@ -1,6 +1,5 @@
 import { type NextPage } from "next";
 import { Button } from "~/components/ui";
-
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
@@ -10,7 +9,7 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <main className="flex min-h-screen flex-col items-center justify-center">
+      <main className="flex h-full flex-col items-center justify-center">
         <h1 className="mb-6 text-4xl font-bold">Washing Machine UI App</h1>
 
         <div>
