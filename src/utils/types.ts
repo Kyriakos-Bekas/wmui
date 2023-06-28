@@ -20,6 +20,8 @@ export interface WashinProgramBase {
   inProgress: boolean;
   start: string; // Date string
   slug: string;
+  type: "DEFAULT" | "CUSTOM";
+  duration: number; // in minutes
 }
 
 export const DEFAULT_WASHING_PROGRAMS = [
