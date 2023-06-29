@@ -30,7 +30,7 @@ const Home: NextPage = () => {
     });
 
   return (
-    <>
+    <div className="container">
       <main>
         <h1 className="mt-8 text-2xl font-bold lg:text-4xl">
           {locale === "en"
@@ -78,7 +78,7 @@ const Home: NextPage = () => {
           </Section>
         </div>
       </main>
-    </>
+    </div>
   );
 };
 
