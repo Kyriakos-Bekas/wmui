@@ -59,13 +59,9 @@ const ListItemOptionsMenu = ({ id }: { id: string }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hover:bg-slate-200 dark:hover:bg-slate-800"
-        >
+        <div className="rounded-md p-3 hover:bg-slate-200 dark:hover:bg-slate-800">
           <MoreVertical className="h-4 w-4" />
-        </Button>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={handleEdit}>
@@ -98,7 +94,7 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
       ] || name;
 
   return (
-    <li className="flex items-center gap-2 rounded-none border border-t-0 border-slate-200 first:rounded-tl-md first:rounded-tr-md first:border-t last:rounded-bl-md last:rounded-br-md last:border-t-0 hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-900">
+    <li className="flex items-center gap-2 rounded-none border border-t-0 border-slate-200 first:rounded-tl-md first:rounded-tr-md first:border-t last:rounded-bl-md last:rounded-br-md last:border-t-0 first-of-type:border-t hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-900">
       <Link href={`/programs/${program.slug}`} className="grow">
         <div className="flex items-center justify-start gap-4 px-4 py-2">
           <h3 className="mr-auto font-medium">{name}</h3>
