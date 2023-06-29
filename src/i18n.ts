@@ -18,7 +18,37 @@ type UiText = {
       description: string;
       empty: string;
     }
-  >;
+  > & {
+    optionsMenu: {
+      edit: string;
+      delete: string;
+      success: (name: string) => string;
+      error: string;
+    };
+  };
+  programPage: {
+    meta: {
+      title: string;
+    };
+    title: string;
+    description: string;
+    saveAsFavorite: {
+      prompt: string;
+      checkbox: string;
+      textField: {
+        label: string;
+        placeholder: string;
+        button: string;
+        toast: {
+          title: string;
+          description: (name: string) => string;
+        };
+      };
+    };
+    form: {
+      submit: string;
+    };
+  };
   loading: string;
   toggleLocale: string;
   toggleTheme: string;
@@ -43,6 +73,39 @@ export const i18n: Record<AvailableLocales, UiText> = {
         description:
           "A collection of pre-configured programs for different types of clothing",
         empty: "Sorry, we couldn't load the presets. Please try again later",
+      },
+      optionsMenu: {
+        edit: "Edit",
+        delete: "Delete",
+        success: (name: string) =>
+          `Program ${name} has been deleted successfully`,
+        error: "Something went wrong. Please try again later",
+      },
+    },
+    programPage: {
+      meta: {
+        title: "Program Page",
+      },
+      title: "Configure Program",
+      description:
+        "Follow these steps to configure your program before you start it",
+      saveAsFavorite: {
+        prompt:
+          "It seems that you’ve changed the default configuration for this program",
+        checkbox: "Would you like to save it as a favorite?",
+        textField: {
+          label: "Give your program a name",
+          placeholder: "My Washing Program",
+          button: "Save",
+          toast: {
+            title: "Success!",
+            description: (name: string) =>
+              `Program ${name} has been saved as a favorite`,
+          },
+        },
+      },
+      form: {
+        submit: "Start Program",
       },
     },
     loading: "Loading...",
@@ -81,6 +144,38 @@ export const i18n: Record<AvailableLocales, UiText> = {
           "Μια συλλογή προκαθορισμένων προγραμμάτων για διαφορετικούς τύπους ρούχων",
         empty:
           "Λυπούμαστε, δεν μπορέσαμε να φορτώσουμε τις προεπιλογές. Παρακαλώ προσπαθήστε ξανά αργότερα",
+      },
+      optionsMenu: {
+        edit: "Επεξεργασία",
+        delete: "Διαγραφή",
+        success: (name: string) => `Το πρόγραμμα ${name} διαγράφηκε επιτυχώς`,
+        error: "Κάτι πήγε στραβά. Παρακαλώ προσπαθήστε ξανά αργότερα",
+      },
+    },
+    programPage: {
+      meta: {
+        title: "Σελίδα Προγράμματος",
+      },
+      title: "Ρύθμιση Προγράμματος",
+      description:
+        "Ακολουθήστε αυτά τα βήματα για να ρυθμίσετε το πρόγραμμά σας πριν το ξεκινήσετε",
+      saveAsFavorite: {
+        prompt:
+          "Φαίνεται ότι έχετε αλλάξει την προεπιλεγμένη ρύθμιση για αυτό το πρόγραμμα",
+        checkbox: "Θέλετε να το αποθηκεύσετε ως αγαπημένο;",
+        textField: {
+          label: "Δώστε ένα όνομα στο πρόγραμμα",
+          placeholder: "Το Πλύσιμο Ρούχων Μου",
+          button: "Αποθήκευση",
+          toast: {
+            title: "Επιτυχία!",
+            description: (name: string) =>
+              `Το πρόγραμμα ${name} αποθηκεύτηκε ως αγαπημένο`,
+          },
+        },
+      },
+      form: {
+        submit: "Έναρξη Προγράμματος",
       },
     },
     loading: "Φόρτωση...",
