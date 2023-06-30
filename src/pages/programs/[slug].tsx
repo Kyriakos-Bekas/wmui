@@ -2,14 +2,27 @@ import { type Program } from "@prisma/client";
 import { type GetStaticPaths, type GetStaticProps } from "next";
 import Head from "next/head";
 import { memo, useEffect, useState } from "react";
-import { Button, Checkbox, Input, Label, useToast } from "~/components/ui";
+import {
+  Button,
+  Checkbox,
+  Input,
+  useToast,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Label,
+} from "~/components/ui";
 import { i18n } from "~/i18n";
 import { prisma } from "~/server/db";
-import { useLocaleStore } from "~/state/locale";
+import { type AvailableLocales, useLocaleStore } from "~/state/locale";
 import {
   type AllowedSpin,
   type AllowedTemperatures,
   DEFAULT_WASHING_PROGRAMS,
+  ALLOWED_SPINS,
+  ALLOWED_TEMPERATURES,
 } from "~/utils/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { saveAsFavoriteNameformSchema } from "~/utils/schemas";
@@ -26,11 +39,16 @@ import {
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
 import { useActiveProgramStore } from "~/state/activeProgram";
+import { RefreshCw, Thermometer } from "lucide-react";
+import * as dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
 
 const Header = ({ name }: { name: string }) => {
   return (
     <div className="flex items-center justify-between border-b border-b-slate-200 py-4 dark:border-b-slate-800">
-      <h1 className="text-3xl font-semibold">{name}</h1>
+      <h1 className="min-h-[2.25rem] text-3xl font-semibold">{name}</h1>
     </div>
   );
 };
@@ -61,10 +79,18 @@ const SaveAsFavoriteForm = () => {
       });
       void router.push("/");
     },
+    onError: (error) => {
+      toast({
+        title: locale === "en" ? "An error occurred" : "Προέκυψε σφάλμα",
+        description: (
+          JSON.parse(error.message) as Record<AvailableLocales, string>
+        )[locale],
+        className: "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200",
+      });
+    },
   });
 
   function onSubmit(values: z.infer<typeof localizedSchema>) {
-    console.log(values);
     mutate({
       name: values.name,
       spin,
@@ -147,6 +173,7 @@ const ProgramPage = ({
   slug,
   spin: defaultSpin,
   temperature: defaultTemperature,
+  duration: programDuration,
 }: Program) => {
   const locale = useLocaleStore((state) => state.locale);
   const name =
@@ -158,7 +185,8 @@ const ProgramPage = ({
     spin: defaultSpin as AllowedSpin,
     temperature: defaultTemperature as AllowedTemperatures,
   });
-  const { setActiveProgram, ...rest } = useActiveProgramStore();
+  const { setActiveProgram } = useActiveProgramStore();
+  const router = useRouter();
 
   useEffect(() => {
     // Set default values for the active program
@@ -172,9 +200,13 @@ const ProgramPage = ({
 
   useEffect(() => {
     // Set active program values in case they are modified
-    setActiveProgram({ ...rest, ...defaultValues });
+    setActiveProgram({ slug, ...defaultValues });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultValues]);
+
+  const handleStartProgram = () => {
+    void router.push(`/in-progress?slug=${slug}`);
+  };
 
   return (
     <>
@@ -203,40 +235,141 @@ const ProgramPage = ({
             </div>
 
             <div className="col-span-2 py-6 lg:pl-6">
-              <form className="ml-auto max-w-lg rounded-md bg-white p-4 shadow-md dark:bg-slate-800">
-                <div className="flex gap-4">
-                  <Button
-                    type="button"
-                    onClick={() =>
+              <div className="ml-auto max-w-lg rounded-md bg-white p-4 shadow-md dark:bg-slate-950">
+                <div className="mb-6 grid">
+                  <Label
+                    htmlFor="spin"
+                    className="mb-3 flex items-center gap-3"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    <span>{i18n[locale].programPage.form.spin.label}</span>
+                  </Label>
+                  <Select
+                    name="spin"
+                    value={`${defaultValues.spin}`}
+                    onValueChange={(value) =>
                       setDefaultValues((prev) => ({
                         ...prev,
-                        spin: (prev.spin - 100) as AllowedSpin,
+                        spin: Number(value) as AllowedSpin,
                       }))
                     }
                   >
-                    Click to modify
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      setDefaultValues(() => ({
-                        spin: defaultSpin as AllowedSpin,
-                        temperature: defaultTemperature as AllowedTemperatures,
-                      }))
-                    }
-                  >
-                    Click to revert
-                  </Button>
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={
+                          i18n[locale].programPage.form.spin.placeholder
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ALLOWED_SPINS.map((spin) => (
+                        <SelectItem key={spin} value={`${spin}`}>
+                          {spin}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="mt-4 w-full bg-green-700 text-white hover:bg-green-600"
-                  size="lg"
-                >
-                  {i18n[locale].programPage.form.submit}
-                </Button>
-              </form>
+                <div className="mb-6 grid">
+                  <Label
+                    htmlFor="temperature"
+                    className="mb-3 flex items-center gap-3"
+                  >
+                    <Thermometer className="h-4 w-4" />
+                    <span>
+                      {i18n[locale].programPage.form.temperature.label}
+                    </span>
+                  </Label>
+                  <Select
+                    name="temperature"
+                    value={`${defaultValues.temperature}`}
+                    onValueChange={(value) =>
+                      setDefaultValues((prev) => ({
+                        ...prev,
+                        temperature: Number(value) as AllowedTemperatures,
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={
+                          i18n[locale].programPage.form.temperature.placeholder
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ALLOWED_TEMPERATURES.map((temp) => (
+                        <SelectItem key={temp} value={`${temp}`}>
+                          {temp}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {defaultValues.temperature >= 70 && (
+                    <p className="mt-2 px-1 text-sm text-orange-600">
+                      <span className="font-semibold">
+                        {locale === "en" ? "Warning" : "Προσοχή"}
+                      </span>
+                      {`: ${i18n[locale].programPage.form.temperature.warning}`}
+                    </p>
+                  )}
+                </div>
+
+                <section className="mb-4 border-t border-t-slate-200 px-6 py-4 text-sm dark:border-t-slate-800">
+                  <div className="max-w-[8rem]">
+                    <div className="my-2 flex items-center justify-between">
+                      <span className="font-medium">
+                        {i18n[locale].programPage.form.duration}
+                      </span>
+                      <span className="shrink-0 text-slate-600 dark:text-slate-400">
+                        {dayjs
+                          .duration(programDuration * 60 * 1000)
+                          .format("H[h] m[m]")
+                          .replace(/\b0y\b/, "")
+                          .replace(/\b0m\b/, "")
+                          .replace(/\b0d\b/, "")
+                          .replace(/\b0h\b/, "")}
+                      </span>
+                    </div>
+                    <div className="my-2 flex items-center justify-between">
+                      <span className="font-medium">
+                        {i18n[locale].programPage.form.load}
+                      </span>
+                      <span className="shrink-0 text-slate-600 dark:text-slate-400">
+                        {`${programDuration} (kg)`}
+                      </span>
+                    </div>
+                  </div>
+                </section>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="col-span-1">
+                    {(defaultSpin !== defaultValues.spin ||
+                      defaultTemperature !== defaultValues.temperature) && (
+                      <Button
+                        variant="ghost"
+                        className="w-full"
+                        onClick={() => {
+                          setDefaultValues(() => ({
+                            spin: defaultSpin as AllowedSpin,
+                            temperature:
+                              defaultTemperature as AllowedTemperatures,
+                          }));
+                        }}
+                      >
+                        {i18n[locale].programPage.form.undo}
+                      </Button>
+                    )}
+                  </div>
+                  <Button
+                    className="col-span-1 bg-green-700 text-white hover:bg-green-600"
+                    onClick={handleStartProgram}
+                  >
+                    {i18n[locale].programPage.form.submit}
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </main>
@@ -248,6 +381,7 @@ const ProgramPage = ({
 export const getStaticPaths: GetStaticPaths = async () => {
   const programs = await prisma.program.findMany({
     select: { slug: true },
+    where: { type: "DEFAULT" },
   });
 
   return {
@@ -272,3 +406,4 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 export default ProgramPage;
+export { HeaderMemoized };

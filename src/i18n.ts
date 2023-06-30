@@ -47,6 +47,30 @@ type UiText = {
     };
     form: {
       submit: string;
+      spin: {
+        label: string;
+        placeholder: string;
+      };
+      temperature: {
+        label: string;
+        placeholder: string;
+        warning: string;
+      };
+      undo: string;
+      duration: string;
+      load: string;
+    };
+  };
+  editProgramPage: {
+    meta: {
+      title: string;
+    };
+    title: string;
+    description: string[];
+    submit: string;
+    toast: {
+      title: string;
+      description: (name: string) => string;
     };
   };
   loading: string;
@@ -106,6 +130,35 @@ export const i18n: Record<AvailableLocales, UiText> = {
       },
       form: {
         submit: "Start Program",
+        spin: {
+          label: "Spin",
+          placeholder: "Select spin speed",
+        },
+        temperature: {
+          label: "Temperature",
+          placeholder: "Select temperature",
+          warning:
+            "Some fabrics may shrink or get damaged if washed at high temperatures",
+        },
+        undo: "Undo Changes",
+        duration: "Duration",
+        load: "Load",
+      },
+    },
+    editProgramPage: {
+      meta: {
+        title: "Edit Program Page",
+      },
+      title: "Edit Program",
+      description: [
+        "Edit the name and the default configuration of this program",
+        "Don't forget to save your changes!",
+      ],
+      submit: "Save Changes",
+      toast: {
+        title: "Success!",
+        description: (name: string) =>
+          `Program ${name} has been updated successfully`,
       },
     },
     loading: "Loading...",
@@ -176,6 +229,34 @@ export const i18n: Record<AvailableLocales, UiText> = {
       },
       form: {
         submit: "Έναρξη Προγράμματος",
+        spin: {
+          label: "Στύψιμο",
+          placeholder: "Επιλέξτε ταχύτητα στυψίματος",
+        },
+        temperature: {
+          label: "Θερμοκρασία",
+          placeholder: "Επιλέξτε θερμοκρασία",
+          warning:
+            "Συγκεκριμένα είδη ρούχων μπορεί να υποστούν ζημιά αν πλυθούν σε υψηλή θερμοκρασία",
+        },
+        undo: "Αναίρεση Αλλαγών",
+        duration: "Διάρκεια",
+        load: "Φορτίο",
+      },
+    },
+    editProgramPage: {
+      meta: {
+        title: "Σελίδα Επεξεργασίας Προγράμματος",
+      },
+      title: "Επεξεργασία Προγράμματος",
+      description: [
+        "Επεξεργαστείτε το όνομα και τις ρυθμίσεις του προγράμματός σας",
+        "Μην ξεχάσετε να αποθηκεύσετε τις αλλαγές σας!",
+      ],
+      submit: "Αποθήκευση Αλλαγών",
+      toast: {
+        title: "Επιτυχία!",
+        description: (name: string) => `Το πρόγραμμα ${name} ενημερώθηκε`,
       },
     },
     loading: "Φόρτωση...",
