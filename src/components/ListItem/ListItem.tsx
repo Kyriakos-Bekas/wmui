@@ -16,9 +16,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Button, useToast } from "../ui";
+import { useToast } from "../ui";
 import { i18n } from "~/i18n";
 import { api } from "~/utils/api";
+import { useRouter } from "next/router";
+import { useLongPress } from "use-long-press";
+import { useState } from "react";
 
 type FavoriteListItemProps = {
   program: Program;
@@ -31,6 +34,7 @@ const ListItemOptionsMenu = ({ id }: { id: string }) => {
     { type: "CUSTOM" },
     { enabled: false }
   );
+  const { data: program } = api.program.getOne.useQuery({ id });
   const { mutate: deleteProgram } = api.program.delete.useMutation({
     onSuccess: ({ name }) => {
       toast({
@@ -48,10 +52,6 @@ const ListItemOptionsMenu = ({ id }: { id: string }) => {
     },
   });
 
-  const handleEdit = () => {
-    console.log("Edit", id);
-  };
-
   const handleDelete = () => {
     deleteProgram({ id });
   };
@@ -64,11 +64,14 @@ const ListItemOptionsMenu = ({ id }: { id: string }) => {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={handleEdit}>
-          <div className="flex grow cursor-pointer items-center gap-2">
+        <DropdownMenuItem>
+          <Link
+            href={`/edit/${program?.slug ?? "unknown"}`}
+            className="flex grow cursor-pointer items-center gap-2"
+          >
             <Pencil className="h-4 w-4" />
             <span>{i18n[locale].homepage.optionsMenu.edit}</span>
-          </div>
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleDelete}>
@@ -85,6 +88,7 @@ const ListItemOptionsMenu = ({ id }: { id: string }) => {
 const ListItem = ({ program }: FavoriteListItemProps) => {
   const locale = useLocaleStore((state) => state.locale);
   let { name } = program;
+  const router = useRouter();
 
   if (program.type === "DEFAULT")
     // Translate default program names
@@ -93,9 +97,37 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
         locale
       ] || name;
 
+  const [isEventTriggeredOnce, setIsEventTriggeredOnce] = useState(false);
+  const handleLongPress = () => {
+    void router.push(`/in-progress?slug=${program.slug}`);
+  };
+
+  const bind = useLongPress(handleLongPress, {
+    onFinish: () => {
+      if (isEventTriggeredOnce) return;
+
+      setIsEventTriggeredOnce(true);
+    },
+    filterEvents: (event) => event.type !== "click",
+    threshold: 1000,
+    captureEvent: true,
+    cancelOnMovement: false,
+  });
+
   return (
     <li className="flex items-center gap-2 rounded-none border border-t-0 border-slate-200 first:rounded-tl-md first:rounded-tr-md first:border-t last:rounded-bl-md last:rounded-br-md last:border-t-0 first-of-type:border-t hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-900">
-      <Link href={`/programs/${program.slug}`} className="grow">
+      <button
+        {...bind()}
+        onClick={() => {
+          if (isEventTriggeredOnce) return;
+          void router.push(
+            `/${program.type === "DEFAULT" ? "programs" : "favorites"}/${
+              program.slug
+            }`
+          );
+        }}
+        className="grow"
+      >
         <div className="flex items-center justify-start gap-4 px-4 py-2">
           <h3 className="mr-auto font-medium">{name}</h3>
 
@@ -109,7 +141,7 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
             <span>{program.spin}</span>
           </div>
         </div>
-      </Link>
+      </button>
       {program.type === "CUSTOM" && <ListItemOptionsMenu id={program.id} />}
     </li>
   );
