@@ -8,3 +8,4 @@ export * from "./label";
 export * from "./form";
 export * from "./use-toast";
 export * from "./toaster";
+export * from "./select";
