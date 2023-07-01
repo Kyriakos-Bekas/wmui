@@ -1,6 +1,9 @@
 import { HeaderMemoized } from "../programs/[slug]";
 import { type Program } from "@prisma/client";
-import { type GetStaticPaths, type GetStaticProps } from "next";
+import {
+  type GetServerSideProps,
+  type InferGetServerSidePropsType,
+} from "next";
 import Head from "next/head";
 import { useState } from "react";
 import {
@@ -44,7 +47,7 @@ const EditCustomProgramPage = ({
   name,
   spin: defaultSpin,
   temperature: defaultTemperature,
-}: Program) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const locale = useLocaleStore((state) => state.locale);
   const [values, setValues] = useState({
     name,
@@ -292,21 +295,15 @@ const EditCustomProgramPage = ({
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const programs = await prisma.program.findMany({
-    select: { slug: true },
-    where: { type: "CUSTOM" },
-  });
-
-  return {
-    paths: programs.map(({ slug }) => ({ params: { slug } })),
-    fallback: false,
-  };
-};
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const program = await prisma.program.findUnique({
-    where: { slug: params?.slug as string },
+// This gets called on every request
+export const getServerSideProps: GetServerSideProps<
+  Omit<Program, "createdAt">
+> = async (req) => {
+  // Get slug from the URL
+  const { slug: programSlug } = req.query;
+  // Fetch program from API
+  const program = await prisma.program.findFirst({
+    where: { type: "CUSTOM", slug: programSlug as string },
   });
 
   if (!program) return { notFound: true };
@@ -314,6 +311,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdAt, ...rest } = program;
 
+  // Pass data to the page via props
   return { props: { ...rest } };
 };
 
