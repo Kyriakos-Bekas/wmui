@@ -112,6 +112,9 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
 
       setIsEventTriggeredOnce(true);
     },
+    onCancel: () => {
+      setApplyAnimation(false);
+    },
     filterEvents: (event) => event.type !== "click",
     threshold: 1000,
     captureEvent: true,

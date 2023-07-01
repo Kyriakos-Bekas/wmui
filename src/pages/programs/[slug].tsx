@@ -169,7 +169,6 @@ const SaveAsFavorite = () => {
 
 const ProgramPage = ({
   name: nameOriginal,
-  type,
   slug,
   spin: defaultSpin,
   temperature: defaultTemperature,
@@ -177,10 +176,8 @@ const ProgramPage = ({
 }: Program) => {
   const locale = useLocaleStore((state) => state.locale);
   const name =
-    type === "DEFAULT"
-      ? DEFAULT_WASHING_PROGRAMS.find((p) => p.slug === slug)?.name[locale] ||
-        nameOriginal
-      : nameOriginal;
+    DEFAULT_WASHING_PROGRAMS.find((p) => p.slug === slug)?.name[locale] ||
+    nameOriginal;
   const [defaultValues, setDefaultValues] = useState({
     spin: defaultSpin as AllowedSpin,
     temperature: defaultTemperature as AllowedTemperatures,
@@ -205,7 +202,7 @@ const ProgramPage = ({
   }, [defaultValues]);
 
   const handleStartProgram = () => {
-    void router.push(`/in-progress?slug=${slug}`);
+    void router.push(`/in-progress/${slug}`);
   };
 
   return (
