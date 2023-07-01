@@ -58,7 +58,7 @@ const ListItemOptionsMenu = ({ id }: { id: string }) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger className="z-10">
         <div className="rounded-md p-3 hover:bg-slate-200 dark:hover:bg-slate-800">
           <MoreVertical className="h-4 w-4" />
         </div>
@@ -99,10 +99,14 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
 
   const [isEventTriggeredOnce, setIsEventTriggeredOnce] = useState(false);
   const handleLongPress = () => {
-    void router.push(`/in-progress?slug=${program.slug}`);
+    void router.push(`/in-progress/${program.slug}`);
   };
+  const [applyAnimation, setApplyAnimation] = useState(false);
 
   const bind = useLongPress(handleLongPress, {
+    onStart: () => {
+      setApplyAnimation(true);
+    },
     onFinish: () => {
       if (isEventTriggeredOnce) return;
 
@@ -115,7 +119,10 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
   });
 
   return (
-    <li className="flex items-center gap-2 rounded-none border border-t-0 border-slate-200 first:rounded-tl-md first:rounded-tr-md first:border-t last:rounded-bl-md last:rounded-br-md last:border-t-0 first-of-type:border-t hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-900">
+    <li
+      id={applyAnimation ? `${program.slug}-load-indicator` : undefined}
+      className="relative flex items-center gap-2 overflow-hidden rounded-none border border-t-0 border-slate-200 first:rounded-tl-md first:rounded-tr-md first:border-t last:rounded-bl-md last:rounded-br-md last:border-t-0 first-of-type:border-t hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-900"
+    >
       <button
         {...bind()}
         onClick={() => {
@@ -126,7 +133,7 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
             }`
           );
         }}
-        className="grow"
+        className="z-10 grow"
       >
         <div className="flex items-center justify-start gap-4 px-4 py-2">
           <h3 className="mr-auto font-medium">{name}</h3>

@@ -34,6 +34,8 @@
     --ring: 215 20.2% 65.1%;
 
     --radius: 0.5rem;
+
+    --load-indicator: theme("colors.green.200");
   }
 
   .dark {
@@ -65,6 +67,8 @@
     --destructive-foreground: 0 85.7% 97.3%;
 
     --ring: 217.2 32.6% 17.5%;
+
+    --load-indicator: theme("colors.green.950");
   }
 }
 
@@ -74,5 +78,31 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer base {
+  [id$="-load-indicator"]::before {
+    --animation-duration: 1s;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: var(--load-indicator);
+    z-index: 1;
+    animation: fill-left var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1)
+      forwards;
+    z-index: 1;
+  }
+
+  /* Animation that fills the box from left to right */
+  @keyframes fill-left {
+    0% {
+      width: 0;
+    }
+    100% {
+      width: 100%;
+    }
   }
 }
