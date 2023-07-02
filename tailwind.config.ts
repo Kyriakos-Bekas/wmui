@@ -67,6 +67,10 @@ module.exports = {
       },
       gridTemplateRows: {
         "app-layout": "auto 1fr",
+        "progress-layout": "1fr auto",
+      },
+      gridTemplateColumns: {
+        "stats-layout": "22.8% 2.9% 22.8% 2.9% 22.8% 2.9% 22.8%",
       },
     },
   },

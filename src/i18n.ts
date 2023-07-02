@@ -7,6 +7,10 @@ type DefaultWashingProgramKeys =
 type HomepageSection = "presets" | "favorites";
 
 type UiText = {
+  app: {
+    title: string;
+    description: string;
+  };
   navbar: {
     help: string;
     contact: string;
@@ -73,6 +77,41 @@ type UiText = {
       description: (name: string) => string;
     };
   };
+  inProgressPage: {
+    meta: {
+      title: string;
+    };
+    titleScheduled: string;
+    titleInProgress: string;
+    notify: string;
+    uiLock: {
+      locked: string;
+      unlocked: string;
+    };
+    pause: {
+      labelPause: string;
+      labelContinue: string;
+      warning: {
+        title: string;
+        description: string;
+        action: string;
+        showAgain: string;
+      };
+    };
+    abort: {
+      label: string;
+      title: string;
+      description: string;
+      actionContinue: string;
+      actionCancel: string;
+    };
+    stages: {
+      washing: string;
+      rinsing: string;
+      draining: string;
+      finish: string;
+    };
+  };
   loading: string;
   toggleLocale: string;
   toggleTheme: string;
@@ -81,6 +120,10 @@ type UiText = {
 
 export const i18n: Record<AvailableLocales, UiText> = {
   en: {
+    app: {
+      title: "Washing Machine UI App",
+      description: "This UI simplifies interacting with your washing machine",
+    },
     navbar: {
       help: "Help",
       contact: "Contact",
@@ -161,6 +204,43 @@ export const i18n: Record<AvailableLocales, UiText> = {
           `Program ${name} has been updated successfully`,
       },
     },
+    inProgressPage: {
+      meta: {
+        title: "Washing",
+      },
+      titleScheduled: "Program is scheduled to start in",
+      titleInProgress: "Program is in progress",
+      notify: "Notify me when the program is finished",
+      uiLock: {
+        locked: "Click to unlock UI",
+        unlocked: "Click to lock UI",
+      },
+      pause: {
+        labelContinue: "Continue",
+        labelPause: "Pause",
+        warning: {
+          title: "Warning",
+          description:
+            "Adding clothes to a program that has started more than 20 minutes ago may result in the clothes not being washed correctly",
+          action: "I understand",
+          showAgain: "Don't show again",
+        },
+      },
+      abort: {
+        label: "Abort",
+        title: "Are you sure you want to abort",
+        description:
+          "If you abort a program then you cannot continue it again at a later point",
+        actionContinue: "Abort",
+        actionCancel: "Cancel",
+      },
+      stages: {
+        washing: "Washing",
+        rinsing: "Rinsing",
+        draining: "Draining",
+        finish: "Finish",
+      },
+    },
     loading: "Loading...",
     toggleLocale: "Toggle Locale",
     toggleTheme: "Toggle Theme",
@@ -180,6 +260,11 @@ export const i18n: Record<AvailableLocales, UiText> = {
     },
   },
   gr: {
+    app: {
+      title: "Διεπαφή Χρήστη για Πλυντήριο Ρούχων",
+      description:
+        "Αυτή η διεπαφή απλοποιεί την επικοινωνία με το πλυντήριό σας",
+    },
     navbar: {
       help: "Βοήθεια",
       contact: "Επικοινωνία",
@@ -257,6 +342,43 @@ export const i18n: Record<AvailableLocales, UiText> = {
       toast: {
         title: "Επιτυχία!",
         description: (name: string) => `Το πρόγραμμα ${name} ενημερώθηκε`,
+      },
+    },
+    inProgressPage: {
+      meta: {
+        title: "Σελίδα Πλύσης",
+      },
+      titleScheduled: "είναι προγραμματισμένο να ξεκινήσει σε",
+      titleInProgress: "βρίσκεται σε εξέλιξη",
+      notify: "Ειδοποίησέ με όταν η πλύση ολοκληρωθεί",
+      uiLock: {
+        locked: "Ξεκλείδωμα Οθόνης",
+        unlocked: "Κλείδωμα Οθόνης",
+      },
+      stages: {
+        washing: "Πλύση",
+        rinsing: "Ξέβγαλμα",
+        draining: "Στύψιμο",
+        finish: "Τέλος",
+      },
+      pause: {
+        labelContinue: "Συνέχεια",
+        labelPause: "Παύση",
+        warning: {
+          title: "Προσοχή!",
+          description:
+            "Αν προσθέσετε ρούχα σε ένα πρόγραμμα που βρίσκεται σε εξέλιξη για πάνω από 20 λεπτά, μπορεί τα ρούχα σας να μην πλυθούν σωστά",
+          action: "Κατάλαβα",
+          showAgain: "Να μην εμφανιστεί ξανά",
+        },
+      },
+      abort: {
+        label: "Ματαίωση",
+        title: "Είστε σίγουροι ότι θέλετε να ματαιώσετε το πρόγραμμα",
+        description:
+          "Αν ματαιώσετε το πρόγραμμα, δεν θα μπορείτε να το ξεκινήσετε πάλι αργότερα",
+        actionCancel: "Ακύρωση",
+        actionContinue: "Ματαίωση",
       },
     },
     loading: "Φόρτωση...",

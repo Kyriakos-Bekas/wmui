@@ -96,6 +96,69 @@
     z-index: 1;
   }
 
+  [id$="-stage"] {
+    position: relative;
+  }
+
+  [id$="-stage"]:not(:last-child) {
+    clip-path: polygon(
+      0% 0%,
+      90% 0%,
+      100% 50%,
+      100% 50%,
+      90% 100%,
+      50% 100%,
+      0% 100%
+    );
+  }
+
+  [id$="-stage"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: var(--load-indicator);
+    z-index: -1;
+    animation: fill-left 3s linear forwards;
+  }
+
+  #washing-stage {
+    /* background-color: theme("colors.green.200"); */
+    z-index: 10;
+  }
+
+  #draining-stage {
+    /* background-color: theme("colors.red.200"); */
+    z-index: 6;
+  }
+
+  #rinsing-stage {
+    /* background-color: theme("colors.blue.200"); */
+    z-index: 4;
+  }
+
+  #finish-stage {
+    /* background-color: theme("colors.slate.200"); */
+    z-index: 2;
+  }
+
+  #washing-stage::before {
+    background-color: theme("colors.green.200");
+  }
+
+  #draining-stage::before {
+    background-color: theme("colors.red.200");
+  }
+
+  #rinsing-stage::before {
+    background-color: theme("colors.blue.200");
+  }
+
+  #finish-stage::before {
+    background-color: theme("colors.slate.200");
+  }
+
   /* Animation that fills the box from left to right */
   @keyframes fill-left {
     0% {
