@@ -1,5 +1,6 @@
 import { Pause, Play } from "lucide-react";
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
+import { useLocalStorage, useReadLocalStorage } from "usehooks-ts";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,37 +17,36 @@ import { i18n } from "~/i18n";
 import { useLocaleStore } from "~/state/locale";
 import { api } from "~/utils/api";
 
-const PauseDialog = ({ id, disabled }: { id: string; disabled: boolean }) => {
+type PauseDialogProps = {
+  id: string;
+  disabled: boolean;
+  onPause: () => void;
+  onContinue: () => void;
+};
+
+const PauseDialog = ({
+  id,
+  disabled,
+  onContinue,
+  onPause,
+}: PauseDialogProps) => {
   const locale = useLocaleStore((state) => state.locale);
   const { data: program } = api.program.getOne.useQuery({ id });
   const [isPaused, setIsPaused] = useState(!program?.inProgress ?? false); // TODO: add state to the program
   const [hide, setHide] = useState(false);
-  const [pauseWarningStored, setPauseWarningStored] = useState(false);
+  const [, setSavedShowWarning] = useLocalStorage("hide-pause-warning", false);
+  const hideWarning = useReadLocalStorage("hide-pause-warning") as boolean;
 
-  useEffect(() => {
-    setPauseWarningStored(
-      JSON.parse(
-        localStorage.getItem("hide-pause-warning") || "false"
-      ) as boolean
-    );
-  }, []);
-
-  useEffect(() => {
-    setHide(pauseWarningStored);
-  }, [pauseWarningStored]);
-
-  // ! This is not working
-  // TODO: Fix this
   const handlePause = () => {
-    if (hide && !pauseWarningStored)
-      localStorage.setItem("hide-pause-warning", "true");
+    if (hide) setSavedShowWarning(true);
     setIsPaused(true);
+    onPause();
   };
 
   const timePassed = 20;
 
   return !isPaused ? (
-    timePassed >= 20 && !pauseWarningStored ? (
+    timePassed >= 20 && !hideWarning ? (
       <AlertDialog>
         <AlertDialogTrigger
           disabled={disabled}
@@ -91,7 +91,7 @@ const PauseDialog = ({ id, disabled }: { id: string; disabled: boolean }) => {
       <Button
         disabled={disabled}
         className="flex w-full items-center justify-center gap-2"
-        onClick={() => setIsPaused(true)}
+        onClick={handlePause}
       >
         <Pause className="h-4 w-4 fill-current" />
         {i18n[locale].inProgressPage.pause.labelPause}
@@ -100,7 +100,10 @@ const PauseDialog = ({ id, disabled }: { id: string; disabled: boolean }) => {
   ) : (
     <Button
       disabled={disabled}
-      onClick={() => setIsPaused(false)}
+      onClick={() => {
+        setIsPaused(false);
+        onContinue();
+      }}
       className="flex w-full items-center justify-center gap-2"
     >
       <Play className="h-4 w-4 fill-current" />

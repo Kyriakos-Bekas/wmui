@@ -4,7 +4,7 @@ import {
   type GetServerSideProps,
   type InferGetServerSidePropsType,
 } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AbortDialog,
   PauseDialog,
@@ -16,8 +16,19 @@ import { prisma } from "~/server/db";
 import { useLocaleStore } from "~/state/locale";
 import * as dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import { useCountdown } from "usehooks-ts";
 
 dayjs.extend(duration);
+
+const formatDuration = (duration: number) =>
+  dayjs
+    .duration(duration)
+    .format("H[h] m[m] s[s]")
+    .replace(/\b0y\b/, "")
+    .replace(/\b0m\b/, "")
+    .replace(/\b0d\b/, "")
+    .replace(/\b0h\b/, "")
+    .replace(/\b0s\b/, "");
 
 const InProgress = ({
   id,
@@ -28,6 +39,14 @@ const InProgress = ({
   const locale = useLocaleStore((state) => state.locale);
   const [notifyOnFinish, setNotifyOnFinish] = useState(false);
   const [uiLocked, setUiLocked] = useState(false);
+  const [count, { startCountdown, stopCountdown }] = useCountdown({
+    countStart: duration * 60,
+  });
+  const [timer, setTimer] = useState(formatDuration(count * 1000));
+
+  useEffect(() => {
+    setTimer(formatDuration(count * 1000));
+  }, [count]);
 
   return (
     <main className="container grid grid-cols-1 grid-rows-progress-layout gap-8 pb-8 pt-6">
@@ -58,7 +77,12 @@ const InProgress = ({
 
           <div className="flex grow items-center gap-2 lg:grow-0 lg:basis-1/4">
             <div className="basis-1/2">
-              <PauseDialog id={id} disabled={uiLocked} />
+              <PauseDialog
+                id={id}
+                disabled={uiLocked}
+                onPause={stopCountdown}
+                onContinue={startCountdown}
+              />
             </div>
             <div className="basis-1/2">
               <AbortDialog id={id} disabled={uiLocked} />
@@ -97,15 +121,7 @@ const InProgress = ({
             <span className="text-sm text-muted-foreground">
               Time remaining
             </span>
-            <span className="text-5xl font-medium">
-              {dayjs
-                .duration(duration * 60 * 1000)
-                .format("H[h] m[m]")
-                .replace(/\b0y\b/, "")
-                .replace(/\b0m\b/, "")
-                .replace(/\b0d\b/, "")
-                .replace(/\b0h\b/, "")}
-            </span>
+            <span className="text-5xl font-medium">{timer}</span>
           </div>
         </section>
       </div>
