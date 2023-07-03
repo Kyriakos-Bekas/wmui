@@ -89,6 +89,9 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
   const locale = useLocaleStore((state) => state.locale);
   let { name } = program;
   const router = useRouter();
+  const { mutate: startProgram } = api.program.start.useMutation({
+    onSuccess: () => void router.push(`/in-progress/${program.slug}`),
+  });
 
   if (program.type === "DEFAULT")
     // Translate default program names
@@ -99,7 +102,7 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
 
   const [isEventTriggeredOnce, setIsEventTriggeredOnce] = useState(false);
   const handleLongPress = () => {
-    void router.push(`/in-progress/${program.slug}`);
+    startProgram({ id: program.id });
   };
   const [applyAnimation, setApplyAnimation] = useState(false);
 

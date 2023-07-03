@@ -14,13 +14,11 @@ import { i18n } from "~/i18n";
 import { useLocaleStore } from "~/state/locale";
 import { api } from "~/utils/api";
 
-const AbortDialog = ({ id, disabled }: { id: string; disabled: boolean }) => {
+type AbortDialogProps = { id: string; disabled: boolean; onAbort: () => void };
+
+const AbortDialog = ({ id, disabled, onAbort }: AbortDialogProps) => {
   const locale = useLocaleStore((state) => state.locale);
   const { data: program } = api.program.getOne.useQuery({ id });
-
-  const handleAbort = () => {
-    console.log(`program aborted`);
-  };
 
   return (
     <AlertDialog>
@@ -47,7 +45,7 @@ const AbortDialog = ({ id, disabled }: { id: string; disabled: boolean }) => {
           <AlertDialogCancel className="mt-0">
             {i18n[locale].inProgressPage.abort.actionCancel}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={handleAbort}>
+          <AlertDialogAction onClick={onAbort}>
             {i18n[locale].inProgressPage.abort.actionContinue}
           </AlertDialogAction>
         </AlertDialogFooter>

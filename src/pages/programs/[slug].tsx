@@ -168,6 +168,7 @@ const SaveAsFavorite = () => {
 };
 
 const ProgramPage = ({
+  id,
   name: nameOriginal,
   slug,
   spin: defaultSpin,
@@ -184,6 +185,9 @@ const ProgramPage = ({
   });
   const { setActiveProgram } = useActiveProgramStore();
   const router = useRouter();
+  const { mutate: startProgram } = api.program.start.useMutation({
+    onSuccess: () => void router.push(`/in-progress/${slug}`),
+  });
 
   useEffect(() => {
     // Set default values for the active program
@@ -202,7 +206,7 @@ const ProgramPage = ({
   }, [defaultValues]);
 
   const handleStartProgram = () => {
-    void router.push(`/in-progress/${slug}`);
+    startProgram({ id });
   };
 
   return (

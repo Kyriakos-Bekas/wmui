@@ -4,3 +4,4 @@ export * from "./ListItem";
 export * from "./Loader";
 export * from "./Dialog";
 export * from "./Animation";
+export * from "./Stages";

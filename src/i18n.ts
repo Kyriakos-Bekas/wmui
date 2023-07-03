@@ -81,8 +81,12 @@ type UiText = {
     meta: {
       title: string;
     };
-    titleScheduled: string;
-    titleInProgress: string;
+    title: {
+      scheduled: string;
+      inProgress: string;
+      paused: string;
+      finished: string;
+    };
     notify: string;
     uiLock: {
       locked: string;
@@ -106,10 +110,17 @@ type UiText = {
       actionCancel: string;
     };
     stages: {
-      washing: string;
-      rinsing: string;
-      draining: string;
+      wash: string;
+      rinse: string;
+      spin: string;
       finish: string;
+    };
+    finish: {
+      toast: {
+        title: string;
+        description: string;
+      };
+      message: string;
     };
   };
   loading: string;
@@ -208,8 +219,12 @@ export const i18n: Record<AvailableLocales, UiText> = {
       meta: {
         title: "Washing",
       },
-      titleScheduled: "Program is scheduled to start in",
-      titleInProgress: "Program is in progress",
+      title: {
+        scheduled: "Program is scheduled to start in",
+        inProgress: "Program is in progress",
+        paused: "Program is paused",
+        finished: "Program has finished",
+      },
       notify: "Notify me when the program is finished",
       uiLock: {
         locked: "Click to unlock UI",
@@ -235,10 +250,17 @@ export const i18n: Record<AvailableLocales, UiText> = {
         actionCancel: "Cancel",
       },
       stages: {
-        washing: "Washing",
-        rinsing: "Rinsing",
-        draining: "Draining",
+        wash: "Washing",
+        rinse: "Rinsing",
+        spin: "Spinning",
         finish: "Finish",
+      },
+      finish: {
+        toast: {
+          title: "Program Finished",
+          description: "Your clothes are ready to be taken out",
+        },
+        message: "Finished!",
       },
     },
     loading: "Loading...",
@@ -348,17 +370,21 @@ export const i18n: Record<AvailableLocales, UiText> = {
       meta: {
         title: "Σελίδα Πλύσης",
       },
-      titleScheduled: "είναι προγραμματισμένο να ξεκινήσει σε",
-      titleInProgress: "βρίσκεται σε εξέλιξη",
+      title: {
+        scheduled: "είναι προγραμματισμένο να ξεκινήσει σε",
+        inProgress: "βρίσκεται σε εξέλιξη",
+        paused: "βρίσκεται σε κατάσταση παύσης",
+        finished: "έχει τελειώσει",
+      },
       notify: "Ειδοποίησέ με όταν η πλύση ολοκληρωθεί",
       uiLock: {
         locked: "Ξεκλείδωμα Οθόνης",
         unlocked: "Κλείδωμα Οθόνης",
       },
       stages: {
-        washing: "Πλύση",
-        rinsing: "Ξέβγαλμα",
-        draining: "Στύψιμο",
+        wash: "Πλύση",
+        rinse: "Ξέβγαλμα",
+        spin: "Στύψιμο",
         finish: "Τέλος",
       },
       pause: {
@@ -379,6 +405,13 @@ export const i18n: Record<AvailableLocales, UiText> = {
           "Αν ματαιώσετε το πρόγραμμα, δεν θα μπορείτε να το ξεκινήσετε πάλι αργότερα",
         actionCancel: "Ακύρωση",
         actionContinue: "Ματαίωση",
+      },
+      finish: {
+        toast: {
+          title: "Το πρόγραμμα ολοκληρώθηκε",
+          description: "Μπορείτε να αφαιρέσετε τα ρούχα σας από το πλυντήριο",
+        },
+        message: "Τέλος!",
       },
     },
     loading: "Φόρτωση...",

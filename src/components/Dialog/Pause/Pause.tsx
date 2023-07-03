@@ -22,6 +22,7 @@ type PauseDialogProps = {
   disabled: boolean;
   onPause: () => void;
   onContinue: () => void;
+  showWarning?: boolean;
 };
 
 const PauseDialog = ({
@@ -29,12 +30,14 @@ const PauseDialog = ({
   disabled,
   onContinue,
   onPause,
+  showWarning = false,
 }: PauseDialogProps) => {
   const locale = useLocaleStore((state) => state.locale);
   const { data: program } = api.program.getOne.useQuery({ id });
   const [isPaused, setIsPaused] = useState(!program?.inProgress ?? false); // TODO: add state to the program
   const [hide, setHide] = useState(false);
   const [, setSavedShowWarning] = useLocalStorage("hide-pause-warning", false);
+  // const [, setProgramPaused] = useLocalStorage("program-paused", isPaused);
   const hideWarning = useReadLocalStorage("hide-pause-warning") as boolean;
 
   const handlePause = () => {
@@ -43,10 +46,12 @@ const PauseDialog = ({
     onPause();
   };
 
-  const timePassed = 20;
+  // useEffect(() => {
+  //   setProgramPaused(isPaused);
+  // }, [isPaused, setProgramPaused]);
 
   return !isPaused ? (
-    timePassed >= 20 && !hideWarning ? (
+    showWarning && !hideWarning ? (
       <AlertDialog>
         <AlertDialogTrigger
           disabled={disabled}

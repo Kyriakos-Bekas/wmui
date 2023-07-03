@@ -1,8 +1,31 @@
-import { type Program } from "@prisma/client";
+import { type ProgramStage, type Program } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { slugify } from "~/utils/slugify";
+
+const determineStage = (
+  duration: number,
+  durationLeft: number
+): ProgramStage => {
+  const percentage = durationLeft / duration;
+
+  if (percentage === 1) {
+    return "IDLE";
+  } else if (percentage > 0.9) {
+    // Finish takes 10% of the time
+    return "FINISH";
+  } else if (percentage > 0.7) {
+    // Spinning takes 20% of the time
+    return "SPIN";
+  } else if (percentage > 0.5) {
+    // Rinsing takes 20% of the time
+    return "RINSE";
+  } else {
+    // Washing takes 50% of the time
+    return "WASH";
+  }
+};
 
 const checkIfNameExists = (
   name: string,
@@ -74,16 +97,21 @@ export const programRouter = createTRPCRouter({
 
       checkIfNameExists(name, nameExists);
 
+      // Generate duration that is between 30 and 120 minutes with a step of 5
+      const duration = Math.floor(Math.random() * 18 + 6) * 5;
+
       return ctx.prisma.program.create({
         data: {
           name,
           type: "CUSTOM",
           temperature,
           spin,
-          duration: Math.floor(Math.random() * 90 + 30),
+          duration,
           inProgress: false,
           start: "",
           slug: slugify(name),
+          stage: "IDLE",
+          durationLeft: duration,
         },
       });
     }),
@@ -147,6 +175,76 @@ export const programRouter = createTRPCRouter({
           temperature,
           spin,
           slug: slugify(name),
+        },
+      });
+    }),
+  setProgress: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        inProgress: z.boolean(),
+        durationLeft: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, inProgress, durationLeft } = input;
+
+      const program = await ctx.prisma.program.findUnique({
+        where: { id },
+      });
+
+      if (!program) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: JSON.stringify({
+            en: `Program with id '${id}' does not exist`,
+            gr: `Το πρόγραμμα με id '${id}' δεν υπάρχει`,
+          }),
+        });
+      }
+
+      return ctx.prisma.program.update({
+        where: { id },
+        data: {
+          ...program,
+          inProgress,
+          stage: inProgress
+            ? determineStage(program.duration, durationLeft)
+            : "IDLE",
+          durationLeft,
+        },
+      });
+    }),
+  start: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id } = input;
+
+      const program = await ctx.prisma.program.findUnique({
+        where: { id },
+      });
+
+      if (!program) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: JSON.stringify({
+            en: `Program with id '${id}' does not exist`,
+            gr: `Το πρόγραμμα με id '${id}' δεν υπάρχει`,
+          }),
+        });
+      }
+
+      return ctx.prisma.program.update({
+        where: { id },
+        data: {
+          ...program,
+          inProgress: true,
+          stage: "WASH",
+          durationLeft: program.duration,
         },
       });
     }),

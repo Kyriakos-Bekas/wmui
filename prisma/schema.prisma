@@ -27,10 +27,20 @@ model Program {
     type      ProgramType
     start     String
     duration  Int
-    inProgress Boolean
+    inProgress Boolean @default(false)
+    stage     ProgramStage @default(IDLE)
+    durationLeft Int
 }
 
 enum ProgramType {
     DEFAULT
     CUSTOM
+}
+
+enum ProgramStage {
+    IDLE
+    WASH
+    RINSE
+    SPIN
+    FINISH
 }

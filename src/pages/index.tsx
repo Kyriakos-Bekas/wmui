@@ -18,6 +18,19 @@ const Section = ({ title, description, children }: SectionProps) => (
   </section>
 );
 
+{
+  /* <div className="flex items-center gap-4 rounded-md border-2 border-green-600 p-4">
+  <Lightbulb className="h-8 w-8" />
+
+  <div className="flex-grow">
+    <p className="text-sm">
+      <span className="text-medium">Quickstart</span>: Press and
+      hold on a program to start it immediately
+    </p>
+  </div>
+</div> */
+}
+
 const Home: NextPage = () => {
   const locale = useLocaleStore((state) => state.locale);
   const { data: favorites, isLoading: isLoadingFavorites } =
