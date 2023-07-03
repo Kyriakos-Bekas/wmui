@@ -2,9 +2,7 @@ export const ALLOWED_TEMPERATURES = [20, 30, 40, 60, 70, 80, 90] as const;
 
 export type AllowedTemperatures = (typeof ALLOWED_TEMPERATURES)[number];
 
-export const ALLOWED_SPINS = [
-  100, 200, 300, 400, 500, 600, 700, 800, 900, 1000,
-] as const;
+export const ALLOWED_SPINS = [300, 400, 500, 600, 700, 800, 900, 1000] as const;
 
 export type AllowedSpin = (typeof ALLOWED_SPINS)[number];
 
@@ -68,7 +66,7 @@ export const DEFAULT_WASHING_PROGRAMS = [
       en: "Handwash",
       gr: "Στο χέρι",
     },
-    spin: 100,
+    spin: 300,
     temperature: 30,
   },
   {
@@ -108,7 +106,7 @@ export const DEFAULT_WASHING_PROGRAMS = [
       en: "Drain",
       gr: "Στύψιμο",
     },
-    spin: 200,
+    spin: 300,
     temperature: 20,
   },
   {
@@ -118,7 +116,7 @@ export const DEFAULT_WASHING_PROGRAMS = [
       en: "Rinse",
       gr: "Ξέβγαλμα",
     },
-    spin: 200,
+    spin: 300,
     temperature: 20,
   },
   {

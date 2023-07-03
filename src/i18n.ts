@@ -54,11 +54,17 @@ type UiText = {
       spin: {
         label: string;
         placeholder: string;
+        noSpin: string;
       };
       temperature: {
         label: string;
         placeholder: string;
         warning: string;
+      };
+      time: {
+        label: string;
+        placeholder: string;
+        exact: string;
       };
       undo: string;
       duration: string;
@@ -187,12 +193,18 @@ export const i18n: Record<AvailableLocales, UiText> = {
         spin: {
           label: "Spin",
           placeholder: "Select spin speed",
+          noSpin: "No Spin",
         },
         temperature: {
           label: "Temperature",
           placeholder: "Select temperature",
           warning:
             "Some fabrics may shrink or get damaged if washed at high temperatures",
+        },
+        time: {
+          label: "Start Time",
+          placeholder: "Select start time",
+          exact: "Schedule start in next 24h",
         },
         undo: "Undo Changes",
         duration: "Duration",
@@ -339,12 +351,18 @@ export const i18n: Record<AvailableLocales, UiText> = {
         spin: {
           label: "Στύψιμο",
           placeholder: "Επιλέξτε ταχύτητα στυψίματος",
+          noSpin: "Χωρίς Στύψιμο",
         },
         temperature: {
           label: "Θερμοκρασία",
           placeholder: "Επιλέξτε θερμοκρασία",
           warning:
             "Συγκεκριμένα είδη ρούχων μπορεί να υποστούν ζημιά αν πλυθούν σε υψηλή θερμοκρασία",
+        },
+        time: {
+          label: "Ώρα Έναρξης",
+          placeholder: "Επιλέξτε ώρα έναρξης",
+          exact: "Επιλέξτε ώρα έναρξης για το επόμενο 24ωρο",
         },
         undo: "Αναίρεση Αλλαγών",
         duration: "Διάρκεια",

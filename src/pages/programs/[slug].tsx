@@ -39,7 +39,7 @@ import {
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
 import { useActiveProgramStore } from "~/state/activeProgram";
-import { RefreshCw, Thermometer } from "lucide-react";
+import { Clock, RefreshCw, Thermometer } from "lucide-react";
 import * as dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 
@@ -265,7 +265,9 @@ const ProgramPage = ({
                     <SelectContent>
                       {ALLOWED_SPINS.map((spin) => (
                         <SelectItem key={spin} value={`${spin}`}>
-                          {spin}
+                          {spin === 300
+                            ? i18n[locale].programPage.form.spin.noSpin
+                            : spin}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -284,6 +286,49 @@ const ProgramPage = ({
                   </Label>
                   <Select
                     name="temperature"
+                    value={`${defaultValues.temperature}`}
+                    onValueChange={(value) =>
+                      setDefaultValues((prev) => ({
+                        ...prev,
+                        temperature: Number(value) as AllowedTemperatures,
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={
+                          i18n[locale].programPage.form.temperature.placeholder
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ALLOWED_TEMPERATURES.map((temp) => (
+                        <SelectItem key={temp} value={`${temp}`}>
+                          {temp}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {defaultValues.temperature >= 70 && (
+                    <p className="mt-2 px-1 text-sm text-orange-600">
+                      <span className="font-semibold">
+                        {locale === "en" ? "Warning" : "Προσοχή"}
+                      </span>
+                      {`: ${i18n[locale].programPage.form.temperature.warning}`}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mb-6 grid">
+                  <Label
+                    htmlFor="time"
+                    className="mb-3 flex items-center gap-3"
+                  >
+                    <Clock className="h-4 w-4" />
+                    <span>{i18n[locale].programPage.form.time.label}</span>
+                  </Label>
+                  <Select
+                    name="time"
                     value={`${defaultValues.temperature}`}
                     onValueChange={(value) =>
                       setDefaultValues((prev) => ({

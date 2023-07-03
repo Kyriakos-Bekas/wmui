@@ -202,7 +202,9 @@ const EditCustomProgramPage = ({
                         <SelectContent>
                           {ALLOWED_SPINS.map((spin) => (
                             <SelectItem key={spin} value={`${spin}`}>
-                              {spin}
+                              {spin === 300
+                                ? i18n[locale].programPage.form.spin.noSpin
+                                : spin}
                             </SelectItem>
                           ))}
                         </SelectContent>
