@@ -313,7 +313,11 @@ const ProgramPage = ({
                     <SelectContent>
                       {ALLOWED_TEMPERATURES.map((temp) => (
                         <SelectItem key={temp} value={`${temp}`}>
-                          {temp}
+                          {temp === 20
+                            ? locale === "en"
+                              ? "Cold"
+                              : "Κρύο"
+                            : temp}
                         </SelectItem>
                       ))}
                     </SelectContent>

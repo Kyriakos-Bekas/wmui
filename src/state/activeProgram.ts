@@ -19,7 +19,7 @@ type ActiveProgramStore = {
 export const useActiveProgramStore = create<ActiveProgramStore>((set) => ({
   slug: "",
   temperature: 20,
-  spin: 100,
+  spin: 300,
   setActiveProgram: ({ slug, temperature, spin }) =>
     set(() => ({ slug, temperature, spin })),
 }));
