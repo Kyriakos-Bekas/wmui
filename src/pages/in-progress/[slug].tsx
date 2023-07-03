@@ -14,17 +14,15 @@ import {
 import { Button, Checkbox, Label, useToast } from "~/components/ui";
 import { i18n } from "~/i18n";
 import { prisma } from "~/server/db";
-import { useLocaleStore } from "~/state/locale";
+import { type AvailableLocales, useLocaleStore } from "~/state/locale";
 import * as dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import {
-  useCountdown,
-  useLocalStorage,
-  useReadLocalStorage,
-} from "usehooks-ts";
+import { useCountdown } from "usehooks-ts";
 import { api } from "~/utils/api";
 import clsx from "clsx";
 import { useRouter } from "next/router";
+import { formatDistanceToNow } from "date-fns";
+import el from "date-fns/locale/el";
 
 dayjs.extend(duration);
 
@@ -43,6 +41,7 @@ const InProgress = ({
   name,
   duration,
   stage,
+  start: startOriginal,
   inProgress: inProgressOriginal,
   durationLeft: durationLeftOriginal,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -64,16 +63,32 @@ const InProgress = ({
     fetchedProgram?.stage ?? stage
   );
   const [inProgress, setInProgress] = useState(inProgressOriginal);
-  const programPaused: boolean =
-    useReadLocalStorage("program-paused") ?? inProgress;
-  const [, setProgramPaused] = useLocalStorage("program-paused", inProgress);
   const [timePassed, setTimePassed] = useState(0);
   const { mutate: setProgramProgress } = api.program.setProgress.useMutation({
     onSuccess: ({ inProgress, stage, durationLeft }) => {
       setInProgress(inProgress);
       setActiveStage(stage);
       setDurationLeft(durationLeft);
-      setProgramPaused(inProgress);
+    },
+  });
+  const { mutate: finishProgram } = api.program.finish.useMutation({
+    onSuccess: () => {
+      setInProgress(false);
+      setDurationLeft(0);
+      if (notifyOnFinish) {
+        toast({
+          title: i18n[locale].inProgressPage.finish.toast.title,
+          description: i18n[locale].inProgressPage.finish.toast.description,
+        });
+      }
+      setTimeout(() => void router.push("/"), 2000);
+    },
+  });
+  const { mutate: abortProgram } = api.program.abort.useMutation({
+    onSuccess: () => {
+      setInProgress(false);
+      setDurationLeft(0);
+      void router.push("/");
     },
   });
   const [progressAsPercent, setProgressAsPercent] = useState(0);
@@ -81,60 +96,38 @@ const InProgress = ({
 
   const handlePause = () => {
     stopCountdown();
-    setProgramPaused(true);
     setProgramProgress({
       id,
       inProgress: false,
-      durationLeft: (timePassed * 60) / duration,
+      durationLeft: duration - timePassed,
     });
   };
 
   const handleContinue = () => {
     startCountdown();
-    setProgramPaused(false);
     setProgramProgress({
       id,
       inProgress: true,
-      durationLeft: (timePassed * 60) / duration,
+      durationLeft: duration - timePassed,
     });
   };
 
+  useEffect(() => {
+    if (inProgress && startOriginal <= 0) {
+      startCountdown();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleProgramAbort = () => {
     stopCountdown();
-    setProgramProgress({
-      id,
-      inProgress: false,
-      durationLeft: duration,
-    });
-    void router.push("/");
+    abortProgram({ id });
   };
 
   const handleProgramFinish = useCallback(() => {
     stopCountdown();
-    setProgramPaused(false);
-    setProgramProgress({
-      id,
-      inProgress: false,
-      durationLeft: duration,
-    });
-    if (notifyOnFinish) {
-      toast({
-        title: i18n[locale].inProgressPage.finish.toast.title,
-        description: i18n[locale].inProgressPage.finish.toast.description,
-      });
-    }
-    setTimeout(() => void router.push("/"), 2000);
-  }, [
-    stopCountdown,
-    setProgramPaused,
-    setProgramProgress,
-    id,
-    duration,
-    toast,
-    locale,
-    router,
-    notifyOnFinish,
-  ]);
+    finishProgram({ id });
+  }, [stopCountdown, finishProgram, id]);
 
   useEffect(() => {
     if (count === 0) {
@@ -145,7 +138,7 @@ const InProgress = ({
     setTimer(formatDuration(count * 1000));
     setTimePassed(duration - count);
     setProgressAsPercent((timePassed / duration) * 100);
-  }, [count, duration, handleProgramFinish, timePassed]);
+  }, [count, duration, handleProgramFinish, id, inProgress, timePassed]);
 
   useEffect(() => {
     if (progressAsPercent <= 50) {
@@ -191,15 +184,18 @@ const InProgress = ({
             <h1 className="text-2xl font-semibold">
               {locale === "gr" && "Το πρόγραμμα"}{" "}
               <span className="text-blue-700">{name}</span>{" "}
-              {
-                i18n[locale].inProgressPage.title[
-                  count !== 0
-                    ? inProgress
-                      ? "inProgress"
-                      : "paused"
-                    : "finished"
-                ]
-              }
+              {(!!fetchedProgram ? fetchedProgram.start : startOriginal) > 0
+                ? ` ${scheduledText(
+                    fetchedProgram?.start ?? startOriginal,
+                    locale
+                  )}`
+                : i18n[locale].inProgressPage.title[
+                    count !== 0
+                      ? inProgress
+                        ? "inProgress"
+                        : "paused"
+                      : "finished"
+                  ]}
             </h1>
 
             {count !== 0 && (
@@ -219,16 +215,18 @@ const InProgress = ({
             )}
           </div>
 
-          {count !== 0 && (
+          {startOriginal >= 0 && count !== 0 && (
             <div className="flex grow items-center gap-2 lg:grow-0 lg:basis-1/4">
               <div className="basis-1/2">
-                <PauseDialog
-                  id={id}
-                  disabled={uiLocked}
-                  onPause={handlePause}
-                  onContinue={handleContinue}
-                  showWarning={timePassed >= 20}
-                />
+                {startOriginal === 0 && (
+                  <PauseDialog
+                    paused={!inProgress}
+                    disabled={uiLocked}
+                    onPause={handlePause}
+                    onContinue={handleContinue}
+                    showWarning={timePassed % 60 >= 20}
+                  />
+                )}
               </div>
               <div className="basis-1/2">
                 <AbortDialog
@@ -268,7 +266,10 @@ const InProgress = ({
         <section className="grid grow grid-cols-1 gap-2 lg:grid-cols-2">
           <div>
             <WashingMachineAnimation
-              paused={programPaused}
+              initialState={
+                (!!fetchedProgram ? fetchedProgram.start : startOriginal) > 0
+              }
+              paused={!inProgress}
               finished={count === 0}
             />
           </div>
@@ -291,6 +292,13 @@ const InProgress = ({
     </main>
   );
 };
+
+function scheduledText(start: number, locale: AvailableLocales) {
+  return `${i18n[locale].inProgressPage.title.scheduled} ${formatDistanceToNow(
+    new Date().setMinutes(new Date().getMinutes() + start),
+    { locale: locale === "en" ? undefined : el }
+  )}`;
+}
 
 // This gets called on every request
 export const getServerSideProps: GetServerSideProps<

@@ -25,7 +25,7 @@ model Program {
     temperature Int
     spin      Int
     type      ProgramType
-    start     String
+    start     Int @default(-1)
     duration  Int
     inProgress Boolean @default(false)
     stage     ProgramStage @default(IDLE)

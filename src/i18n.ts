@@ -11,6 +11,7 @@ type UiText = {
     title: string;
     description: string;
   };
+  back: string;
   navbar: {
     help: string;
     contact: string;
@@ -65,6 +66,7 @@ type UiText = {
         label: string;
         placeholder: string;
         exact: string;
+        relativeTimeLabel: (time: number) => string;
       };
       undo: string;
       duration: string;
@@ -129,6 +131,13 @@ type UiText = {
       message: string;
     };
   };
+  helpPage: {
+    meta: {
+      title: string;
+    };
+    title: string;
+    description: string;
+  };
   loading: string;
   toggleLocale: string;
   toggleTheme: string;
@@ -141,6 +150,7 @@ export const i18n: Record<AvailableLocales, UiText> = {
       title: "Washing Machine UI App",
       description: "This UI simplifies interacting with your washing machine",
     },
+    back: "Back",
     navbar: {
       help: "Help",
       contact: "Contact",
@@ -165,6 +175,13 @@ export const i18n: Record<AvailableLocales, UiText> = {
           `Program ${name} has been deleted successfully`,
         error: "Something went wrong. Please try again later",
       },
+    },
+    helpPage: {
+      meta: {
+        title: "Help",
+      },
+      title: "You need help?",
+      description: "Here is a video tutorial of how to use the application",
     },
     programPage: {
       meta: {
@@ -205,6 +222,8 @@ export const i18n: Record<AvailableLocales, UiText> = {
           label: "Start Time",
           placeholder: "Select start time",
           exact: "Schedule start in next 24h",
+          relativeTimeLabel: (time: number) =>
+            time === 0 ? "Start now" : `Start in ${time} minutes`,
         },
         undo: "Undo Changes",
         duration: "Duration",
@@ -232,7 +251,7 @@ export const i18n: Record<AvailableLocales, UiText> = {
         title: "Washing",
       },
       title: {
-        scheduled: "Program is scheduled to start in",
+        scheduled: "Program will start in",
         inProgress: "Program is in progress",
         paused: "Program is paused",
         finished: "Program has finished",
@@ -299,6 +318,15 @@ export const i18n: Record<AvailableLocales, UiText> = {
       description:
         "Αυτή η διεπαφή απλοποιεί την επικοινωνία με το πλυντήριό σας",
     },
+    back: "Πίσω",
+    helpPage: {
+      meta: {
+        title: "Βοήθεια",
+      },
+      title: "Χρειάζεστε βοήθεια;",
+      description:
+        "Εδώ θα βρείτε ένα βίντεο με οδηγίες για το πως να χρησιμοποιήσετε την εφαρμογή",
+    },
     navbar: {
       help: "Βοήθεια",
       contact: "Επικοινωνία",
@@ -347,7 +375,7 @@ export const i18n: Record<AvailableLocales, UiText> = {
         },
       },
       form: {
-        submit: "Έναρξη Προγράμματος",
+        submit: "Έναρξη",
         spin: {
           label: "Στύψιμο",
           placeholder: "Επιλέξτε ταχύτητα στυψίματος",
@@ -363,6 +391,8 @@ export const i18n: Record<AvailableLocales, UiText> = {
           label: "Ώρα Έναρξης",
           placeholder: "Επιλέξτε ώρα έναρξης",
           exact: "Επιλέξτε ώρα έναρξης για το επόμενο 24ωρο",
+          relativeTimeLabel: (time: number) =>
+            time === 0 ? "Έναρξη τώρα" : `Έναρξη σε ${time} λεπτά`,
         },
         undo: "Αναίρεση Αλλαγών",
         duration: "Διάρκεια",
@@ -389,7 +419,7 @@ export const i18n: Record<AvailableLocales, UiText> = {
         title: "Σελίδα Πλύσης",
       },
       title: {
-        scheduled: "είναι προγραμματισμένο να ξεκινήσει σε",
+        scheduled: "θα ξεκινήσει σε",
         inProgress: "βρίσκεται σε εξέλιξη",
         paused: "βρίσκεται σε κατάσταση παύσης",
         finished: "έχει τελειώσει",

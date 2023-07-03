@@ -1,7 +1,7 @@
 import { type Program } from "@prisma/client";
 import { type GetStaticPaths, type GetStaticProps } from "next";
 import Head from "next/head";
-import { memo, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -23,6 +23,8 @@ import {
   DEFAULT_WASHING_PROGRAMS,
   ALLOWED_SPINS,
   ALLOWED_TEMPERATURES,
+  ALLOWED_RELATIVE_TIME,
+  type AllowedRelativeTime,
 } from "~/utils/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { saveAsFavoriteNameformSchema } from "~/utils/schemas";
@@ -42,6 +44,7 @@ import { useActiveProgramStore } from "~/state/activeProgram";
 import { Clock, RefreshCw, Thermometer } from "lucide-react";
 import * as dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import { ExactTimeSelect } from "~/components";
 
 dayjs.extend(duration);
 
@@ -182,12 +185,18 @@ const ProgramPage = ({
   const [defaultValues, setDefaultValues] = useState({
     spin: defaultSpin as AllowedSpin,
     temperature: defaultTemperature as AllowedTemperatures,
+    start: 0,
   });
   const { setActiveProgram } = useActiveProgramStore();
   const router = useRouter();
   const { mutate: startProgram } = api.program.start.useMutation({
     onSuccess: () => void router.push(`/in-progress/${slug}`),
   });
+  const [showExactTimeSelect, setShowExactTimeSelect] = useState(false);
+
+  const handleExactTimeChange = useCallback((value: number) => {
+    setDefaultValues((prev) => ({ ...prev, start: value }));
+  }, []);
 
   useEffect(() => {
     // Set default values for the active program
@@ -206,7 +215,7 @@ const ProgramPage = ({
   }, [defaultValues]);
 
   const handleStartProgram = () => {
-    startProgram({ id });
+    startProgram({ id, start: defaultValues.start });
   };
 
   return (
@@ -327,39 +336,49 @@ const ProgramPage = ({
                     <Clock className="h-4 w-4" />
                     <span>{i18n[locale].programPage.form.time.label}</span>
                   </Label>
-                  <Select
-                    name="time"
-                    value={`${defaultValues.temperature}`}
-                    onValueChange={(value) =>
-                      setDefaultValues((prev) => ({
-                        ...prev,
-                        temperature: Number(value) as AllowedTemperatures,
-                      }))
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue
-                        placeholder={
-                          i18n[locale].programPage.form.temperature.placeholder
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ALLOWED_TEMPERATURES.map((temp) => (
-                        <SelectItem key={temp} value={`${temp}`}>
-                          {temp}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {defaultValues.temperature >= 70 && (
-                    <p className="mt-2 px-1 text-sm text-orange-600">
-                      <span className="font-semibold">
-                        {locale === "en" ? "Warning" : "Προσοχή"}
-                      </span>
-                      {`: ${i18n[locale].programPage.form.temperature.warning}`}
-                    </p>
+                  {showExactTimeSelect ? (
+                    <ExactTimeSelect onChange={handleExactTimeChange} />
+                  ) : (
+                    <Select
+                      name="time"
+                      value={`${defaultValues.start}`}
+                      onValueChange={(value) =>
+                        setDefaultValues((prev) => ({
+                          ...prev,
+                          start: Number(value) as AllowedRelativeTime,
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            i18n[locale].programPage.form.time.placeholder
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ALLOWED_RELATIVE_TIME.map((time) => (
+                          <SelectItem key={time} value={`${time}`}>
+                            {i18n[
+                              locale
+                            ].programPage.form.time.relativeTimeLabel(time)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
+                  <div className="mt-2 flex items-center gap-3 pl-2">
+                    <Checkbox
+                      id="exact-time"
+                      checked={showExactTimeSelect}
+                      onCheckedChange={(checked) =>
+                        setShowExactTimeSelect(Boolean(checked))
+                      }
+                    />
+                    <Label htmlFor="exact-time">
+                      {i18n[locale].programPage.form.time.exact}
+                    </Label>
+                  </div>
                 </div>
 
                 <section className="mb-4 border-t border-t-slate-200 px-6 py-4 text-sm dark:border-t-slate-800">
@@ -392,7 +411,8 @@ const ProgramPage = ({
                 <div className="grid grid-cols-2 gap-2">
                   <div className="col-span-1">
                     {(defaultSpin !== defaultValues.spin ||
-                      defaultTemperature !== defaultValues.temperature) && (
+                      defaultTemperature !== defaultValues.temperature ||
+                      defaultValues.start !== 0) && (
                       <Button
                         variant="ghost"
                         className="w-full"
@@ -401,6 +421,7 @@ const ProgramPage = ({
                             spin: defaultSpin as AllowedSpin,
                             temperature:
                               defaultTemperature as AllowedTemperatures,
+                            start: 0,
                           }));
                         }}
                       >

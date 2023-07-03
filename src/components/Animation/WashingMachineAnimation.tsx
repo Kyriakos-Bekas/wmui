@@ -5,27 +5,25 @@ import animationData from "~/assets/laundry-animation.json";
 type WashingMachineAnimationProps = {
   paused: boolean;
   finished: boolean;
+  initialState: boolean;
 };
 
 const WashingMachineAnimation = ({
   paused,
   finished,
+  initialState,
 }: WashingMachineAnimationProps) => {
   const animationRef = useRef<LottieRefCurrentProps>(null);
 
   useEffect(() => {
-    if (paused) {
+    if (finished || initialState) {
+      animationRef.current?.goToAndStop(43, true);
+    } else if (paused) {
       animationRef.current?.pause();
     } else {
       animationRef.current?.play();
     }
-  }, [paused]);
-
-  useEffect(() => {
-    if (finished) {
-      animationRef.current?.goToAndStop(43, true);
-    }
-  }, [finished]);
+  }, [paused, finished, initialState]);
 
   return (
     <div className="flex items-center overflow-hidden lg:translate-y-8">
@@ -33,6 +31,7 @@ const WashingMachineAnimation = ({
         lottieRef={animationRef}
         animationData={animationData}
         className="scale-150"
+        start={paused ? 0 : 43}
       />
     </div>
   );

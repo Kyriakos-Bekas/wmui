@@ -34,7 +34,7 @@ const Stage = ({ id, progress }: StageProps) => {
         "row-start-1 row-end-2 flex items-center justify-center px-8 py-4",
         gridPosition,
         {
-          "bg-green-500 text-white before:bg-transparent": progress >= 100,
+          "bg-green-700 text-white before:bg-transparent": progress >= 100,
         }
       )}
     >

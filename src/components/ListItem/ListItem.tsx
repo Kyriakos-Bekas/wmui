@@ -102,7 +102,7 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
 
   const [isEventTriggeredOnce, setIsEventTriggeredOnce] = useState(false);
   const handleLongPress = () => {
-    startProgram({ id: program.id });
+    startProgram({ id: program.id, start: 0 });
   };
   const [applyAnimation, setApplyAnimation] = useState(false);
 

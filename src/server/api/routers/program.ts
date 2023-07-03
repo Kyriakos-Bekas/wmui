@@ -108,7 +108,7 @@ export const programRouter = createTRPCRouter({
           spin,
           duration,
           inProgress: false,
-          start: "",
+          start: -1,
           slug: slugify(name),
           stage: "IDLE",
           durationLeft: duration,
@@ -219,8 +219,39 @@ export const programRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        start: z.number(),
       })
     )
+    .mutation(async ({ ctx, input }) => {
+      const { id, start } = input;
+
+      const program = await ctx.prisma.program.findUnique({
+        where: { id },
+      });
+
+      if (!program) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: JSON.stringify({
+            en: `Program with id '${id}' does not exist`,
+            gr: `Το πρόγραμμα με id '${id}' δεν υπάρχει`,
+          }),
+        });
+      }
+
+      return ctx.prisma.program.update({
+        where: { id },
+        data: {
+          ...program,
+          inProgress: start === 0,
+          stage: start === 0 ? "WASH" : "IDLE",
+          durationLeft: program.duration,
+          start,
+        },
+      });
+    }),
+  finish: publicProcedure
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const { id } = input;
 
@@ -242,9 +273,40 @@ export const programRouter = createTRPCRouter({
         where: { id },
         data: {
           ...program,
-          inProgress: true,
-          stage: "WASH",
+          inProgress: false,
+          stage: "IDLE",
           durationLeft: program.duration,
+          start: -1,
+        },
+      });
+    }),
+  abort: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { id } = input;
+
+      const program = await ctx.prisma.program.findUnique({
+        where: { id },
+      });
+
+      if (!program) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: JSON.stringify({
+            en: `Program with id '${id}' does not exist`,
+            gr: `Το πρόγραμμα με id '${id}' δεν υπάρχει`,
+          }),
+        });
+      }
+
+      return ctx.prisma.program.update({
+        where: { id },
+        data: {
+          ...program,
+          inProgress: false,
+          stage: "IDLE",
+          durationLeft: program.duration,
+          start: -1,
         },
       });
     }),

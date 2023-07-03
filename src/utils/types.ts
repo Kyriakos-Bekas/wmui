@@ -141,6 +141,21 @@ export const DEFAULT_WASHING_PROGRAMS = [
   },
 ] as const;
 
+export const ALLOWED_RELATIVE_TIME = [
+  0, // now
+  5, // in 5 minutes
+  10, // in 10 minutes
+  15, // in 15 minutes
+  30, // in 30 minutes
+  35, // in 35 minutes
+  40, // in 40 minutes
+  45, // in 45 minutes
+  50, // in 50 minutes
+  55, // in 55 minutes
+] as const;
+
+export type AllowedRelativeTime = (typeof ALLOWED_RELATIVE_TIME)[number];
+
 // extract the default program types from the array
 export type DefaultWashingProgramNameEn =
   (typeof DEFAULT_WASHING_PROGRAMS)[number]["name"]["en"];

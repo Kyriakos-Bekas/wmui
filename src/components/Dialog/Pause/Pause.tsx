@@ -15,10 +15,9 @@ import {
 } from "~/components/ui";
 import { i18n } from "~/i18n";
 import { useLocaleStore } from "~/state/locale";
-import { api } from "~/utils/api";
 
 type PauseDialogProps = {
-  id: string;
+  paused: boolean;
   disabled: boolean;
   onPause: () => void;
   onContinue: () => void;
@@ -26,31 +25,23 @@ type PauseDialogProps = {
 };
 
 const PauseDialog = ({
-  id,
+  paused,
   disabled,
   onContinue,
   onPause,
   showWarning = false,
 }: PauseDialogProps) => {
   const locale = useLocaleStore((state) => state.locale);
-  const { data: program } = api.program.getOne.useQuery({ id });
-  const [isPaused, setIsPaused] = useState(!program?.inProgress ?? false); // TODO: add state to the program
   const [hide, setHide] = useState(false);
   const [, setSavedShowWarning] = useLocalStorage("hide-pause-warning", false);
-  // const [, setProgramPaused] = useLocalStorage("program-paused", isPaused);
   const hideWarning = useReadLocalStorage("hide-pause-warning") as boolean;
 
   const handlePause = () => {
     if (hide) setSavedShowWarning(true);
-    setIsPaused(true);
     onPause();
   };
 
-  // useEffect(() => {
-  //   setProgramPaused(isPaused);
-  // }, [isPaused, setProgramPaused]);
-
-  return !isPaused ? (
+  return !paused ? (
     showWarning && !hideWarning ? (
       <AlertDialog>
         <AlertDialogTrigger
@@ -105,10 +96,7 @@ const PauseDialog = ({
   ) : (
     <Button
       disabled={disabled}
-      onClick={() => {
-        setIsPaused(false);
-        onContinue();
-      }}
+      onClick={() => onContinue()}
       className="flex w-full items-center justify-center gap-2"
     >
       <Play className="h-4 w-4 fill-current" />
