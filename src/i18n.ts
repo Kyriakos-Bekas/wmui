@@ -153,13 +153,12 @@ export const i18n: Record<AvailableLocales, UiText> = {
     back: "Back",
     navbar: {
       help: "Help",
-      contact: "Contact",
+      contact: "Call us",
     },
     homepage: {
       favorites: {
         title: "Favorites",
-        description:
-          "Your saved programs will be listed here. Press and hold on a program to start it immediately",
+        description: "Your saved programs will be listed here.",
         empty: "You don't have any favorite programs yet",
       },
       presets: {
@@ -329,13 +328,12 @@ export const i18n: Record<AvailableLocales, UiText> = {
     },
     navbar: {
       help: "Βοήθεια",
-      contact: "Επικοινωνία",
+      contact: "Καλέστε μας",
     },
     homepage: {
       favorites: {
         title: "Αγαπημένα",
-        description:
-          "Τα αγαπημένα σας προγράμματα θα εμφανίζονται εδώ. Πατήστε και κρατήστε πατημένο ένα πρόγραμμα για να το ξεκινήσετε αμέσως",
+        description: "Τα αγαπημένα σας προγράμματα θα εμφανίζονται εδώ.",
         empty: "Δεν έχετε ακόμα αγαπημένα προγράμματα",
       },
       presets: {

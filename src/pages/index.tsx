@@ -10,13 +10,31 @@ type SectionProps = {
   children: React.ReactNode;
 };
 
-const Section = ({ title, description, children }: SectionProps) => (
-  <section className="mb-8 max-w-md lg:mb-0">
-    <h2 className="text-2xl font-semibold">{title}</h2>
-    <p className="mt-3 text-slate-600 dark:text-slate-400">{description}</p>
-    <div className="mt-6">{children}</div>
-  </section>
-);
+const Section = ({ title, description, children }: SectionProps) => {
+  const locale = useLocaleStore((state) => state.locale);
+
+  return (
+    <section className="mb-8 max-w-md lg:mb-0">
+      <h2 className="text-2xl font-semibold">{title}</h2>
+      <p className="mt-3 text-slate-600 dark:text-slate-400">{description}</p>
+      {
+        <p className="mt-2">
+          <span className="font-bold">
+            {locale === "en"
+              ? "Press and hold"
+              : "Πατήστε και κρατήστε πατημένο"}
+          </span>
+          <span className="text-slate-600 dark:text-slate-400">
+            {locale === "en"
+              ? " on a program to start it immediately"
+              : " σε ένα πρόγραμμα για να ξεκινήσει αμέσως"}
+          </span>
+        </p>
+      }
+      <div className="mt-6">{children}</div>
+    </section>
+  );
+};
 
 {
   /* <div className="flex items-center gap-4 rounded-md border-2 border-green-600 p-4">

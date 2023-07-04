@@ -45,8 +45,13 @@ const AbortDialog = ({ id, disabled, onAbort }: AbortDialogProps) => {
           <AlertDialogCancel className="mt-0">
             {i18n[locale].inProgressPage.abort.actionCancel}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onAbort}>
-            {i18n[locale].inProgressPage.abort.actionContinue}
+          <AlertDialogAction
+            onClick={onAbort}
+            className="bg-destructive hover:bg-destructive/75"
+          >
+            <span className="text-white">
+              {i18n[locale].inProgressPage.abort.actionContinue}
+            </span>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

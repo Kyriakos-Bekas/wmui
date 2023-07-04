@@ -22,12 +22,73 @@ import { api } from "~/utils/api";
 import { useRouter } from "next/router";
 import { useLongPress } from "use-long-press";
 import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+
+const DeleteDialog = ({
+  name,
+  onDelete,
+}: {
+  name: string;
+  onDelete: () => void;
+}) => {
+  const locale = useLocaleStore((state) => state.locale);
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger>
+        <div className="flex grow cursor-pointer items-center gap-2">
+          <Trash className="h-4 w-4" />
+          <span>{i18n[locale].homepage.optionsMenu.delete}</span>
+        </div>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {locale === "en"
+              ? "Are you sure you want to delete program"
+              : "Είστε σίγουροι ότι θέλετε να διαγράψετε το πρόγραμμα"}
+            <span className="text-blue-700"> {name}</span>
+            {locale === "en" ? "?" : ";"}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {locale === "en"
+              ? "This action cannot be undone"
+              : "Αυτή η ενέργεια δεν μπορεί να αναιρεθεί"}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>
+            {locale === "en" ? "Cancel" : "Ακύρωση"}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive hover:bg-destructive/75"
+            onClick={onDelete}
+          >
+            <span className="text-white">
+              {locale === "en" ? "Delete" : "Διαγραφή"}
+            </span>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
 
 type FavoriteListItemProps = {
   program: Program;
 };
 
-const ListItemOptionsMenu = ({ id }: { id: string }) => {
+const ListItemOptionsMenu = ({ id, name }: { id: string; name: string }) => {
   const locale = useLocaleStore((state) => state.locale);
   const { toast } = useToast();
   const { refetch: refetchCustomPrograms } = api.program.getAll.useQuery(
@@ -74,11 +135,8 @@ const ListItemOptionsMenu = ({ id }: { id: string }) => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleDelete}>
-          <div className="flex grow cursor-pointer items-center gap-2">
-            <Trash className="h-4 w-4" />
-            <span>{i18n[locale].homepage.optionsMenu.delete}</span>
-          </div>
+        <DropdownMenuItem onClick={(e) => e.preventDefault()}>
+          <DeleteDialog name={name} onDelete={handleDelete} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -155,7 +213,9 @@ const ListItem = ({ program }: FavoriteListItemProps) => {
           </div>
         </div>
       </button>
-      {program.type === "CUSTOM" && <ListItemOptionsMenu id={program.id} />}
+      {program.type === "CUSTOM" && (
+        <ListItemOptionsMenu name={name} id={program.id} />
+      )}
     </li>
   );
 };

@@ -224,7 +224,7 @@ const InProgress = ({
                     disabled={uiLocked}
                     onPause={handlePause}
                     onContinue={handleContinue}
-                    showWarning={timePassed % 60 >= 20}
+                    showWarning={true}
                   />
                 )}
               </div>
