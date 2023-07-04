@@ -277,7 +277,7 @@ const InProgress = ({
           <div className="flex flex-col items-center gap-4 text-center lg:self-center">
             {count !== 0 && (
               <span className="text-sm text-muted-foreground">
-                Time remaining
+                {locale === "en" ? "Time remaining" : "Χρόνος που απομένει"}
               </span>
             )}
             <span className="text-5xl font-medium">
