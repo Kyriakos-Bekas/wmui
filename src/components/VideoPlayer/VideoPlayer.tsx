@@ -5,7 +5,7 @@ import { Button } from "../ui";
 const VideoPlayer = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
   return (
     <div className="relative aspect-video h-full w-full">
